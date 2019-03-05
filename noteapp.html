@@ -1,0 +1,189 @@
+<style type="text/css">
+ /*Style for the note boxes themselves*/
+.note {
+    position: relative;
+    float: left;
+    height: auto;
+    width: 100%;
+    min-width: 50px;
+    min-height: 72px;
+    margin-bottom: 8px;
+    margin-right: 0px;
+    padding: 8px 8px;
+    box-sizing: border-box;
+    
+    color: White;
+    border: none;
+    font-size: 24px;
+    font-family: Monospace;
+}
+
+/*When the note is selected, the delete button will appear. Click off of the note to hide the delete button*/
+.note:focus + .delete_button{
+    display: block;
+}
+
+/*Adds placeholder text to the notes when they're empty*/
+.note:empty::before{
+    color: Gainsboro;
+    content: 'Enter note';
+}
+
+/*Style for the "Add a new note" button*/
+.add_note_button {
+    min-width: 50px;
+    min-height: 50px;
+    float: right;
+    margin-right: 50%;
+    background-color: Black;
+    padding: 0 8px;
+    
+    color: White;
+    border: none;
+    font-size: 16px;
+}
+
+/*Style for the delete button*/
+.delete_button {
+    position: absolute;
+    float: right;
+    right: 3px;
+    top: 3px;
+    z-index: 1;
+    display: none;
+    background-color: LightGray;
+    border: none;
+}
+
+/*Delete button should still be visible if it's being hovered over - otherwise, the button click won't register*/
+.delete_button:hover{
+    display: block;
+}
+
+/*Style for the parent container for both the note box and the delete button*/
+.parent_container {
+    position: relative;
+    float: bottom;
+    overflow: auto;
+    height: auto;
+    margin-bottom: 8px;
+    width: 50%;
+}
+
+</style>
+ <!DOCTYPE html>
+<html>
+<body>
+
+    <div>
+        <div id="notelist"></div>
+        <button class="add_note_button" onclick=addNote()>Add Note</button>
+    </div>
+    
+</body>
+</html>
+ <script type="text/javascript">
+var COLOUR_COUNT = 6;
+var DYNAMIC_COLOURATION = true; //Determines whether or not the colours of the note boxes will auto-update if a note is deleted
+var DELETE_CONFIRMATION_REQUIRED = false; //Determines whether or not a confirmation prompt will appear when a note is to be deleted
+
+function addNote(){
+    //Creates a new note, and a delete button for that note
+    //Structured as: parent container->(note, delete button)
+    
+    //Set up the parent container
+    var parentContainer = document.createElement("div");
+    parentContainer.setAttribute("class", "parent_container");
+    
+    //Set up the note
+    var newNote = document.createElement("div");
+    newNote.setAttribute("class", "note");
+    newNote.setAttribute("contenteditable", "true");    //"contenteditable" is what will allow the user to type into the div element
+    setNoteColour([newNote]);
+    
+    //Set up the delete button
+    var deleteButton = document.createElement("button");
+    deleteButton.setAttribute("class", "delete_button");
+    deleteButton.setAttribute("onclick", "deleteNote(this);");
+    deleteButton.innerHTML = "Delete";
+    
+    //Update the children of the parent container, and then add it as a child to the list of notes itself
+    parentContainer.appendChild(newNote);
+    parentContainer.appendChild(deleteButton);
+    document.getElementById("notelist").appendChild(parentContainer);
+}
+
+function deleteNote(deleteButton){
+    //Deletes an existing note
+    
+    //Check if the user has enabled confirmation upon attempted deletion
+    if(DELETE_CONFIRMATION_REQUIRED){
+        var confirmation = window.confirm("Are you sure you want to delete this note?");
+        //Abort deletion if the user chooses not to proceed
+        if(!confirmation)
+            return;
+    }
+    
+    var masterNoteList = document.getElementById("notelist");
+    
+    //Check if the remaining notes (that aren't being deleted) need to have their colours updated
+    if(DYNAMIC_COLOURATION){
+        //Get the entire list of notes (excluding the note pending deletion) so they can be re-coloured
+        var existingNoteContainers = masterNoteList.childNodes;
+        var existingNotes = [];
+        var existingNoteCount = existingNoteContainers.length;
+        for(var i = 0; i < existingNoteCount; i++){
+            if(existingNoteContainers[i] != deleteButton.parentElement)
+                existingNotes.push(existingNoteContainers[i].firstChild);
+        }
+        //Update the note colours
+        setNoteColour(existingNotes, updateAllNotes=true);
+    }
+    
+    //Delete the note
+    masterNoteList.removeChild(deleteButton.parentElement);
+}
+
+function setNoteColour(notes, updateAllNotes=false){
+    //Get the current note count for all the notes being supplied to the function, using modulo to set the note's colour
+    //If only one note is supplied, have the colour selection index equal (total note count) modulo (colour count)
+    var noteCount = notes.length;
+    var colourIndex = (document.getElementById("notelist").childElementCount) % COLOUR_COUNT;
+    var colour = "LightGray";
+    
+    for(var i = 0; i < noteCount; i++){
+        //Check that the class name matches what we want to change, to make sure we don't modify something we don't want to
+        if(notes[i].className === "note"){
+            //If multiple notes are supplied, have the colour selection index equal (for-loop's incrementer) modulo (colour count) instead
+            if(updateAllNotes)
+                colourIndex = i % COLOUR_COUNT;
+            //Select a colour from a pre-defined list. Update COLOUR_COUNT above if new colours are added or removed
+            switch(colourIndex){
+                case 0:
+                    colour = "Tomato";
+                    break;
+                case 1:
+                    colour = "Orange";
+                    break;
+                case 2:
+                    colour = "DodgerBlue";
+                    break;
+                case 3:
+                    colour = "MediumSeaGreen";
+                    break;
+                case 4:
+                    colour = "SlateBlue";
+                    break;
+                case 5:
+                    colour = "Violet";
+                    break;
+                default:
+                    colour = "LightGray";
+            }
+            //Set the note's background colour
+            notes[i].style.backgroundColor = colour;
+        }
+    }
+}
+
+ </script>
