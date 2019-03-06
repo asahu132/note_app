@@ -1,5 +1,5 @@
 # note_app
-A simple note-taking app written in HTML, CSS, and JavaScript
+A simple note-taking app written in HTML, CSS, and JavaScript.
 
 Allows the user to add, edit, and delete notes: click on the "Add Note" button to add a note, click on a note to edit the text, and delete a note by selecting it and clicking the "Delete" button.
 
