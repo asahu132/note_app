@@ -5,4 +5,4 @@ Allows the user to add, edit, and delete notes: click on the "Add Note" button t
 
 Note colours will auto-update from a set list as they're added or removed. Core functionality; minimal overhead.
 
-Interactive demo: https://jsfiddle.net/Tropicarnage/43tc7qgw/
+[Interactive demo](https://jsfiddle.net/Tropicarnage/43tc7qgw/)
